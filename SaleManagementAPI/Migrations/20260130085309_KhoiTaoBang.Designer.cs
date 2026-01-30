@@ -12,8 +12,8 @@ using SaleManagementAPI.Data;
 namespace SaleManagementAPI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260130021929_KhoiTaoDB")]
-    partial class KhoiTaoDB
+    [Migration("20260130085309_KhoiTaoBang")]
+    partial class KhoiTaoBang
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

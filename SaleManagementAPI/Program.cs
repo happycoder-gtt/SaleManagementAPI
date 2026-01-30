@@ -1,11 +1,16 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using SaleManagementAPI.Data;
+using SaleManagementAPI.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
 builder.Services.AddControllers();
+
+//Add PasswordHasher
+builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 
 //Kết nối đến DBMS
 builder.Services.AddDbContext<AppDbContext>(options =>

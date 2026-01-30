@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace SaleManagementAPI.Migrations
 {
     /// <inheritdoc />
-    public partial class KhoiTaoDB : Migration
+    public partial class KhoiTaoBang : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
