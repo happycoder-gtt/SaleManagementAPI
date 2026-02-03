@@ -1,9 +1,13 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using SaleManagementAPI.Data;
 using SaleManagementAPI.DTOs.Auth;
 using SaleManagementAPI.Models;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 
 namespace SaleManagementAPI.Controllers
 {
@@ -13,12 +17,15 @@ namespace SaleManagementAPI.Controllers
     {
         private readonly AppDbContext _db;
         private readonly IPasswordHasher<User> _passwordHasher;
+        private readonly IConfiguration _config;
 
         public AuthController(AppDbContext db, 
-                        IPasswordHasher<User> passwordHasher)
+                        IPasswordHasher<User> passwordHasher,
+                        IConfiguration config)
         {
             _db = db;
             _passwordHasher = passwordHasher;
+            _config = config;
         }
 
         [HttpPost("register")]
@@ -98,11 +105,38 @@ namespace SaleManagementAPI.Controllers
                     Message = "Password is incorrect."
                 });
 
+
+
             return Ok(new LoginResponseDTO
             {
                 Success = true,
-                Message = "Login succesful!"
+                Message = "Login succesful!",
+                Token = GenerateJwtToken(user)
             });
+        }
+
+        private string GenerateJwtToken(User user)
+        {
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(ClaimTypes.Name, user.Username),
+                new Claim(ClaimTypes.Role, user.Role)
+            };
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:SecretKey"]));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+            var token = new JwtSecurityToken(
+                issuer: _config["Jwt:Issuer"],
+                audience: _config["Jwt:Audience"],
+                claims: claims,
+                expires: DateTime.Now.AddHours(1),
+                signingCredentials: creds
+            );
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
+
         }
     }
 }
